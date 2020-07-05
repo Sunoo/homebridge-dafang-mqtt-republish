@@ -2,7 +2,7 @@
     "pluginAlias": "dafangMqtt",
     "pluginType": "platform",
     "singular": true,
-    "headerDisplay": "",
+    "headerDisplay": "Republishes MQTT Motion Messages from Dafang Hacks into a Format homebridge-camera-ffmpeg Understands",
     "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/pulls) on [Project Page](https://github.com/Sunoo/homebridge-dafang-mqtt-republish).",
     "schema": {
         "type": "object",

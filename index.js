@@ -19,17 +19,18 @@ dafangMqtt.prototype.connectMqtt = function() {
     const port = this.config.port || '1883';
     const client = mqtt.connect('mqtt://' + server + ':' + port);
     client.on('connect', () => {
-        this.log('MQTT connected');
+        this.log('MQTT Connection Opened');
 		this.config.cameras.forEach(camera => {
         	client.subscribe(camera.dafang_topic + '/motion');
     	});
     });
     client.on('message', (topic, message) => {
         const msg = message.toString();
-        this.log(topic, msg);
+        this.log.debug('Received MQTT Message - ' + topic + ': ' + msg);
 		this.config.cameras.forEach(camera => {
 		    if (camera.dafang_topic + '/motion' == topic) {
 		        if (msg == 'ON') {
+		        	this.log.debug('Publishing MQTT Message - ' + camera.homebridge_topic + ': ' + camera.name);
         			client.publish(camera.homebridge_topic, camera.name);
         		}
         	}

@@ -1,8 +1,8 @@
 {
   "displayName": "Homebridge Dafang MQTT Republish",
   "name": "homebridge-dafang-mqtt-republish",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Republishes MQTT Motion Messages from Dafang Hacks into a Format homebridge-camera-ffmpeg Understands",
   "repository": {
     "type": "git",
     "url": "git://github.com/Sunoo/homebridge-dafang-mqtt-republish.git"
