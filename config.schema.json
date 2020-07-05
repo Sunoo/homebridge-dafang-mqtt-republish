@@ -1,0 +1,56 @@
+{
+    "pluginAlias": "dafangMqtt",
+    "pluginType": "platform",
+    "singular": true,
+    "headerDisplay": "",
+    "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/pulls) on [Project Page](https://github.com/Sunoo/homebridge-dafang-mqtt-republish).",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "required": true,
+                "default": "Dafang MQTT",
+                "description": "A unique name for the accessory."
+            },
+            "server": {
+                "title": "MQTT Server",
+                "type": "string",
+                "placeholder": "127.0.0.1"
+            },
+            "port": {
+                "title": "MQTT Port",
+                "type": "integer",
+                "placeholder": "1883"
+            },
+            "cameras": {
+                "title": "Cameras",
+                "type": "array",
+                "required": true,
+                "minLength": 1,
+                "items": {
+                    "title": "Camera",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Camera Name",
+                            "type": "string",
+                            "placeholder": "Camera Name"
+                            },
+                        "dafang_topic": {
+                            "title": "Dafang MQTT Topic",
+                            "type": "string",
+                            "placeholder": "myhome/dafang"
+                            },
+                        "homebridge_topic": {
+                            "title": "Homebridge MQTT Topic",
+                            "type": "string",
+                            "placeholder": "homebridge/motion"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

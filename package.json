@@ -1,0 +1,30 @@
+{
+  "displayName": "Homebridge Dafang MQTT Republish",
+  "name": "homebridge-dafang-mqtt-republish",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Sunoo/homebridge-dafang-mqtt-republish.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "dafang",
+    "dafang-hacks",
+    "mqtt",
+    "camera"
+  ],
+  "author": "David Maher",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/Sunoo/homebridge-dafang-mqtt-republish/issues"
+  },
+  "homepage": "https://github.com/Sunoo/homebridge-dafang-mqtt-republish#readme",
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.3.0"
+  },
+  "dependencies": {
+    "mqtt": ">=4.1.0"
+  }
+}
