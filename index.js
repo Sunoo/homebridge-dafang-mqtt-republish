@@ -20,20 +20,23 @@ dafangMqtt.prototype.connectMqtt = function() {
     const client = mqtt.connect('mqtt://' + server + ':' + port);
     client.on('connect', () => {
         this.log('MQTT Connection Opened');
-		this.config.cameras.forEach(camera => {
-        	client.subscribe(camera.dafang_topic + '/motion');
-    	});
+        this.config.cameras.forEach(camera => {
+            client.subscribe(camera.dafang_topic + '/motion');
+        });
     });
     client.on('message', (topic, message) => {
         const msg = message.toString();
         this.log.debug('Received MQTT Message - ' + topic + ': ' + msg);
-		this.config.cameras.forEach(camera => {
-		    if (camera.dafang_topic + '/motion' == topic) {
-		        if (msg == 'ON') {
-		        	this.log.debug('Publishing MQTT Message - ' + camera.homebridge_topic + ': ' + camera.name);
-        			client.publish(camera.homebridge_topic, camera.name);
-        		}
-        	}
-    	});
+        this.config.cameras.forEach(camera => {
+            if (camera.dafang_topic + '/motion' == topic) {
+                if (msg == 'ON') {
+                    this.log.debug('Publishing MQTT Message - ' + camera.homebridge_topic + ': ' + camera.name);
+                    client.publish(camera.homebridge_topic, camera.name);
+                } else if (msg == 'OFF') {
+                    this.log.debug('Publishing MQTT Message - ' + camera.homebridge_topic + '/reset: ' + camera.name);
+                    client.publish(camera.homebridge_topic + '/reset', camera.name);
+                }
+            }
+        });
     });
 }

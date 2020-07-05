@@ -17,12 +17,14 @@
             "server": {
                 "title": "MQTT Server",
                 "type": "string",
-                "placeholder": "127.0.0.1"
+                "placeholder": "127.0.0.1",
+                "description": "The address of your MQTT server."
             },
             "port": {
                 "title": "MQTT Port",
                 "type": "integer",
-                "placeholder": "1883"
+                "placeholder": "1883",
+                "description": "The port of your MQTT server."
             },
             "cameras": {
                 "title": "Cameras",
@@ -36,19 +38,22 @@
                         "name": {
                             "title": "Camera Name",
                             "type": "string",
-                			"required": true
-                            },
+                			"required": true,
+                			"description": "Name of your camera. (Needs to be the same as in homebridge-camera-ffmpeg config)"
+                        },
                         "dafang_topic": {
                             "title": "Dafang MQTT Topic",
                             "type": "string",
                 			"required": true,
-                            "placeholder": "myhome/dafang"
-                            },
+                            "placeholder": "myhome/dafang",
+                			"description": "MQTT topic that your camera publishes to."
+                        },
                         "homebridge_topic": {
                             "title": "Homebridge MQTT Topic",
                             "type": "string",
                 			"required": true,
-                            "placeholder": "homebridge/motion"
+                            "placeholder": "homebridge/motion",
+                			"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
                         }
                     }
                 }
