@@ -6,10 +6,10 @@ This plugin republishes MQTT motion messages from [Dafang Hacks](https://github.
 Note that this plugin itself does not expose any devices to HomeKit.
 
 ### Installation
-1. Install homebridge using `npm install -g homebridge`.
-2. Install homebridge-camera-ffmpeg using `npm install -g homebridge-camera-ffmpeg`.
-2. Install this plugin using `npm install -g homebridge-dafang-mqtt-republish`.
-3. Update your configuration file. See configuration sample below.
+1. Install Homebridge using the [official instructions](https://github.com/homebridge/homebridge/wiki).
+2. Install homebridge-camera-ffmpeg using `sudo npm install -g homebridge-camera-ffmpeg --unsafe-perm`.
+3. Install this plugin using `sudo npm install -g homebridge-dafang-mqtt-republish`.
+4. Update your configuration file. See configuration sample below.
 
 ### Configuration
 Edit your `config.json` accordingly. Configuration sample:
