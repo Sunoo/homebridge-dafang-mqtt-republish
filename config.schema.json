@@ -54,6 +54,13 @@
                 			"required": true,
                             "placeholder": "homebridge/motion",
                 			"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
+                        },
+                        "cooldown": {
+                            "title": "Cooldown (Seconds)",
+                            "type": "integer",
+							"placeholder": 0,
+							"minimum": 0,
+                			"description": "Set to 0 to disable."
                         }
                     }
                 }

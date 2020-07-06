@@ -39,3 +39,4 @@ Edit your `config.json` accordingly. Configuration sample:
 | \|- name             | Name of your camera. (Needs to be the same as in homebridge-camera-ffmpeg config) | Yes      |
 | \|- dafang_topic     | MQTT topic that your camera publishes to.                                         | Yes      |
 | \|- homebridge_topic | MQTT topic that homebridge-camera-ffmpeg is subscribed to.                        | Yes      |
+| \|- cooldown         | Cooldown in seconds. Set to 0 to disable.                                         | No       |
