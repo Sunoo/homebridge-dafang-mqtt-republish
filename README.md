@@ -21,24 +21,24 @@ Edit your `config.json` accordingly. Configuration sample:
             "platform": "dafangMqtt",
             "server": "10.0.1.190",
             "port": 1883,
+            "homebridge_topic": "homebridge/motion",
             "cameras": [
                 {
                     "name": "Cat Food Camera",
-                    "dafang_topic": "dafang/catcam",
-                    "homebridge_topic": "homebridge/motion"
+                    "dafang_topic": "dafang/catcam"
                 }
             ]
         }
     ]
 ```
 
-| Fields               | Description                                                                       | Required |
-|----------------------|-----------------------------------------------------------------------------------|----------|
-| platform             | Must always be `dafangMqtt`.                                                      | Yes      |
-| server               | The address of your MQTT server. (Default: 127.0.0.1)                             | No       |
-| port                 | The port of your MQTT server. (Default: 1883)                                     | No       |
-| cameras              | Array of Dafang Hacks camera configs (multiple supported).                        | Yes      |
-| \|- name             | Name of your camera. (Needs to be the same as in homebridge-camera-ffmpeg config) | Yes      |
-| \|- dafang_topic     | MQTT topic that your camera publishes to.                                         | Yes      |
-| \|- homebridge_topic | MQTT topic that homebridge-camera-ffmpeg is subscribed to.                        | Yes      |
-| \|- cooldown         | Cooldown in seconds. Set to 0 to disable.                                         | No       |
+| Fields               | Description                                                                             | Required |
+|----------------------|-----------------------------------------------------------------------------------------|----------|
+| platform             | Must always be `dafangMqtt`.                                                            | Yes      |
+| server               | The address of your MQTT server. (Default: 127.0.0.1)                                   | No       |
+| port                 | The port of your MQTT server. (Default: 1883)                                           | No       |
+| homebridge_topic     | MQTT topic that homebridge-camera-ffmpeg is subscribed to. (Default: homebridge/motion) | Yes      |
+| cameras              | Array of Dafang Hacks camera configs (multiple supported).                              | Yes      |
+| \|- name             | Name of your camera. (Needs to be the same as in homebridge-camera-ffmpeg config)       | Yes      |
+| \|- dafang_topic     | MQTT topic that your camera publishes to. (Must be unique per camera)                   | Yes      |
+| \|- cooldown         | Cooldown in seconds. Set to 0 to disable.                                               | No       |

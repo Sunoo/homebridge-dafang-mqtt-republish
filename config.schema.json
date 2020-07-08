@@ -26,6 +26,12 @@
                 "placeholder": "1883",
                 "description": "The port of your MQTT server."
             },
+			"homebridge_topic": {
+				"title": "Homebridge MQTT Topic",
+				"type": "string",
+				"default": "homebridge/motion",
+				"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
+			},
             "cameras": {
                 "title": "Cameras",
                 "type": "array",
@@ -46,14 +52,7 @@
                             "type": "string",
                 			"required": true,
                             "placeholder": "myhome/dafang",
-                			"description": "MQTT topic that your camera publishes to."
-                        },
-                        "homebridge_topic": {
-                            "title": "Homebridge MQTT Topic",
-                            "type": "string",
-                			"required": true,
-                            "placeholder": "homebridge/motion",
-                			"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
+                			"description": "MQTT topic that your camera publishes to. (Must be unique per camera)"
                         },
                         "cooldown": {
                             "title": "Cooldown (Seconds)",
