@@ -29,7 +29,7 @@
 			"homebridge_topic": {
 				"title": "Homebridge MQTT Topic",
 				"type": "string",
-				"default": "homebridge/motion",
+				"default": "homebridge",
 				"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
 			},
             "cameras": {

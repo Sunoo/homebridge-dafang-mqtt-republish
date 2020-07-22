@@ -11,7 +11,10 @@ function dafangMqtt(log, config, api) {
     const port = config.port || '1883';
     this.mqttUrl = 'mqtt://' + server + ':' + port;
 
-    this.homebridge_topic = config.homebridge_topic || 'homebridge/motion';
+    this.homebridge_topic = 'homebridge';
+    if (config.homebridge_topic && config.homebridge_topic != 'homebridge/motion') {
+      mqtttopic = config.homebridge_topic;
+    }
 
     const cameraConfigs = config.cameras || [];
 
