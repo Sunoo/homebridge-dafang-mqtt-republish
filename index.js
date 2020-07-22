@@ -85,8 +85,8 @@ dafangMqtt.prototype.connectMqtt = function connectMqtt() {
             if (msg == 'ON') {
                 camera.motion = true;
                 if (!camera.timer) {
-                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + ': ' + camera.name);
-                    client.publish(this.homebridge_topic, camera.name);
+                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion: ' + camera.name);
+                    client.publish(this.homebridge_topic + '/motion', camera.name);
                 } else {
                     this.log.debug('Motion set received, but cooldown running: ' + camera.name);
                 }
@@ -99,8 +99,8 @@ dafangMqtt.prototype.connectMqtt = function connectMqtt() {
                     camera.timer = setTimeout(function() {
                         this.log.debug('Cooldown finished, motion detected = ' + camera.motion + ': ' + camera.name);
                         if (!camera.motion) {
-                            this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/reset: ' + camera.name);
-                            client.publish(this.homebridge_topic + '/reset', camera.name);
+                            this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion/reset: ' + camera.name);
+                            client.publish(this.homebridge_topic + '/motion/reset', camera.name);
                         }
                         camera.timer = null;
                     }.bind(this), camera.cooldown * 1000);
@@ -108,8 +108,8 @@ dafangMqtt.prototype.connectMqtt = function connectMqtt() {
             } else if (msg == 'OFF') {
                 camera.motion = false;
                 if (!camera.timer) {
-                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/reset: ' + camera.name);
-                    client.publish(this.homebridge_topic + '/reset', camera.name);
+                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion/reset: ' + camera.name);
+                    client.publish(this.homebridge_topic + '/motion/reset', camera.name);
                 } else {
                     this.log.debug('Motion clear received, but cooldown running: ' + camera.name);
                 }
