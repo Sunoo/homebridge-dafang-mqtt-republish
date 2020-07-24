@@ -1,7 +1,7 @@
 const mqtt = require('mqtt');
 
 module.exports = function(homebridge) {
-    homebridge.registerPlatform("homebridge-dafang-mqtt-republish", "dafangMqtt", dafangMqtt, true);
+    homebridge.registerPlatform('homebridge-dafang-mqtt-republish', 'dafangMqtt', dafangMqtt, true);
 }
 
 function dafangMqtt(log, config, api) {
@@ -36,82 +36,104 @@ function dafangMqtt(log, config, api) {
         var error = false;
 
         if (!newCamera.name) {
-            this.log.error('WARNING: No name set for this camera. It will not work unless this is corrected.');
+            this.log.warn('WARNING: No name set for this camera. It will not work unless this is corrected.');
             error = true;
         }
 
         if (!newCamera.dafang_topic) {
-            this.log.error('WARNING: No topic set for this camera. It will not work unless this is corrected.');
+            this.log.warn('WARNING: No topic set for this camera. It will not work unless this is corrected.');
             error = true;
         }
 
         if (this.cameras.find(camera => camera.name === newCamera.name)) {
-            this.log.error('WARNING: Multiple cameras named "' + newCamera.name + '" configured. Only the first loaded will function.');
+            this.log.warn('WARNING: Multiple cameras named "' + newCamera.name + '" configured. Only the first loaded will function.');
             error = true;
         }
         if (this.cameras.find(camera => camera.dafang_topic === newCamera.dafang_topic)) {
-            this.log.error('WARNING: Multiple cameras with topic "' + newCamera.dafang_topic + '" configured. Only the first loaded will function.');
+            this.log.warn('WARNING: Multiple cameras with topic "' + newCamera.dafang_topic + '" configured. Only the first loaded will function.');
             error = true;
         }
 
         if (!error) {
             this.cameras.push(newCamera);
         } else {
-            this.log.debug('There was error with the config so this camera was ignored.')
+            this.log.warn('There was error with the config so this camera was ignored.')
         }
     });
 
-    if (api) {
-        api.on('didFinishLaunching', this.connectMqtt.bind(this));
+    api.on('didFinishLaunching', this.connectMqtt.bind(this));
+}
+
+dafangMqtt.prototype.publishMqtt = function(topic, message) {
+    this.log.debug('Publishing MQTT Message - ' + topic + ': ' + message);
+    this.client.publish(topic, message);
+}
+
+dafangMqtt.prototype.parseMsg = function(message) {
+    switch (message) {
+        case 'ON':
+            return true;
+        case 'OFF':
+            return false;
+        default:
+            return undefined;
     }
 }
 
-dafangMqtt.prototype.connectMqtt = function connectMqtt() {
-    const client = mqtt.connect(this.mqttUrl);
-    client.on('connect', () => {
+dafangMqtt.prototype.handleMotion = function(camera, bool) {
+    if (bool) {
+        camera.motion = true;
+        if (!camera.timer) {
+            this.publishMqtt(this.homebridge_topic + '/motion', camera.name);
+        } else {
+            this.log.debug('Motion set received, but cooldown running: ' + camera.name);
+        }
+        if (camera.cooldown > 0) {
+            if (camera.timer) {
+                this.log.debug('Cancelling existing cooldown timer: ' + camera.name);
+                clearTimeout(camera.timer);
+            }
+            this.log.debug('Cooldown enabled, starting timer: ' + camera.name);
+            camera.timer = setTimeout(function() {
+                this.log.debug('Cooldown finished, motion detected = ' + camera.motion + ': ' + camera.name);
+                if (!camera.motion) {
+                    this.publishMqtt(this.homebridge_topic + '/motion/reset', camera.name);
+                }
+                camera.timer = null;
+            }.bind(this), camera.cooldown * 1000);
+        }
+    } else {
+        camera.motion = false;
+        if (!camera.timer) {
+            this.publishMqtt(this.homebridge_topic + '/motion/reset', camera.name);
+        } else {
+            this.log.debug('Motion clear received, but cooldown running: ' + camera.name);
+        }
+    }
+}
+
+dafangMqtt.prototype.connectMqtt = function() {
+    this.client = mqtt.connect(this.mqttUrl);
+    this.client.on('connect', () => {
         this.log('MQTT Connection Opened');
         this.log.debug('Clearing motion for all cameras...');
         this.cameras.forEach(camera => {
-            client.subscribe(camera.dafang_topic + '/motion');
-            this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/reset: ' + camera.name);
-            client.publish(this.homebridge_topic + '/reset', camera.name);
+            this.client.subscribe(camera.dafang_topic + '/#');
+            this.publishMqtt(this.homebridge_topic + '/reset', camera.name);
         });
     });
-    client.on('message', (topic, message) => {
+    this.client.on('message', (topic, message) => {
         const msg = message.toString();
         this.log.debug('Received MQTT Message - ' + topic + ': ' + msg);
-        const camera = this.cameras.find(camera => topic === camera.dafang_topic + '/motion');
+        const camera = this.cameras.find(camera => topic.startsWith(camera.dafang_topic));
         if (camera) {
-            if (msg == 'ON') {
-                camera.motion = true;
-                if (!camera.timer) {
-                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion: ' + camera.name);
-                    client.publish(this.homebridge_topic + '/motion', camera.name);
-                } else {
-                    this.log.debug('Motion set received, but cooldown running: ' + camera.name);
-                }
-                if (camera.cooldown > 0) {
-                    if (camera.timer) {
-                        this.log.debug('Cancelling existing cooldown timer: ' + camera.name);
-                        clearTimeout(camera.timer);
-                    }
-                    this.log.debug('Cooldown enabled, starting timer: ' + camera.name);
-                    camera.timer = setTimeout(function() {
-                        this.log.debug('Cooldown finished, motion detected = ' + camera.motion + ': ' + camera.name);
-                        if (!camera.motion) {
-                            this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion/reset: ' + camera.name);
-                            client.publish(this.homebridge_topic + '/motion/reset', camera.name);
-                        }
-                        camera.timer = null;
-                    }.bind(this), camera.cooldown * 1000);
-                }
-            } else if (msg == 'OFF') {
-                camera.motion = false;
-                if (!camera.timer) {
-                    this.log.debug('Publishing MQTT Message - ' + this.homebridge_topic + '/motion/reset: ' + camera.name);
-                    client.publish(this.homebridge_topic + '/motion/reset', camera.name);
-                } else {
-                    this.log.debug('Motion clear received, but cooldown running: ' + camera.name);
+            const command = topic.substring(camera.dafang_topic.length + 1);
+            const bool = this.parseMsg(msg);
+            if (bool !== undefined) {
+                switch (command) {
+                    case 'motion':
+                        this.handleMotion(camera, bool);
+                        break;
                 }
             }
         }
