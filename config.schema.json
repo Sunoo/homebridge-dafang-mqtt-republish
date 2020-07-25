@@ -29,7 +29,7 @@
 			"homebridge_topic": {
 				"title": "Homebridge MQTT Topic",
 				"type": "string",
-				"default": "homebridge",
+				"placeholder": "homebridge",
 				"description": "MQTT topic that homebridge-camera-ffmpeg is subscribed to."
 			},
             "cameras": {
@@ -60,6 +60,80 @@
 							"placeholder": 0,
 							"minimum": 0,
                 			"description": "Set to 0 to disable."
+                        },
+                        "manufacturer": {
+                            "title": "Manufacturer",
+                            "type": "string",
+                			"description": "Manufacturer for exposed accessories."
+                        },
+                        "model": {
+                            "title": "Model",
+                            "type": "string",
+                			"description": "Model for exposed accessories."
+                        },
+                        "serialNumber": {
+                            "title": "Serial Number",
+                            "type": "string",
+                			"description": "Serial number for exposed accessories."
+                        },
+                        "firmwareRevision": {
+                            "title": "Firmware Revision",
+                            "type": "string",
+                			"description": "Firmware revision for exposed accessories."
+                        },
+                        "accessories": {
+                            "title": "Accessories",
+                            "type": "object",
+                            "properties": {
+                                "blueLed": {
+                                    "title": "Blue LED",
+                                    "type": "boolean"
+                                },
+                                "yellowLed": {
+                                    "title": "Yellow LED",
+                                    "type": "boolean"
+                                },
+                                "irLed": {
+                                    "title": "IR LED",
+                                    "type": "boolean"
+                                },
+                                "irCut": {
+                                    "title": "IR Filter",
+                                    "type": "boolean"
+                                },
+                                "nightMode": {
+                                    "title": "Night Mode",
+                                    "type": "boolean"
+                                },
+                                "motionTracking": {
+                                    "title": "Motion Tracking",
+                                    "type": "boolean"
+                                },
+                                "motorsVertical": {
+                                    "title": "Tilt",
+                                    "type": "boolean"
+                                },
+                                "motorsHorizontal": {
+                                    "title": "Pan",
+                                    "type": "boolean"
+                                },
+                                "recording": {
+                                    "title": "Recording",
+                                    "type": "boolean"
+                                },
+                                "snapshot": {
+                                    "title": "Snapshot",
+                                    "type": "boolean"
+                                },
+                                "brightness": {
+                                    "title": "Brightness",
+                                    "type": "string",
+                                    "oneOf": [
+                                        { "title": "Hardware", "enum": ["hw"] },
+                                        { "title": "Virtual", "enum": ["virtual"] }
+                                    ]
+                                }
+                            }
                         }
                     }
                 }
