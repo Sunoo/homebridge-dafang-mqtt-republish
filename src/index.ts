@@ -13,7 +13,7 @@ import {
 } from 'homebridge';
 import mqtt from 'mqtt';
 import { DafangMqttPlatformConfig, CameraConfig } from './configTypes';
-const version = require('./package.json').version; // eslint-disable-line @typescript-eslint/no-var-requires
+const version = require('../package.json').version; // eslint-disable-line @typescript-eslint/no-var-requires
 
 let hap: HAP;
 let Accessory: typeof PlatformAccessory;
