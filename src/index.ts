@@ -138,6 +138,10 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     let motorsRightService = accessory.getServiceById(hap.Service.Switch, '/motors/horizontal/right');
     let recordingService = accessory.getServiceById(hap.Service.Switch, '/recording');
     let snapshotService = accessory.getServiceById(hap.Service.Switch, '/snapshot');
+    let rtspMjpegService = accessory.getServiceById(hap.Service.Switch, '/rtsp_mjpeg_server');
+    let rtspH264Service = accessory.getServiceById(hap.Service.Switch, '/rtsp_h264_server');
+    let remountService = accessory.getServiceById(hap.Service.Switch, '/remount_sdcard');
+    let rebootService = accessory.getServiceById(hap.Service.Switch, '/reboot');
 
     if (blueLedService) {
       accessory.removeService(blueLedService);
@@ -177,6 +181,18 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     }
     if (snapshotService) {
       accessory.removeService(snapshotService);
+    }
+    if (rtspMjpegService) {
+      accessory.removeService(rtspMjpegService);
+    }
+    if (rtspH264Service) {
+      accessory.removeService(rtspH264Service);
+    }
+    if (remountService) {
+      accessory.removeService(remountService);
+    }
+    if (rebootService) {
+      accessory.removeService(rebootService);
     }
 
     if (config.accessories.blueLed) {
@@ -338,6 +354,62 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
           callback();
         });
       accessory.addService(snapshotService);
+    }
+    if (config.accessories.rtsp_mjpeg_server) {
+      rtspMjpegService = new hap.Service.Switch(config.name + ' RTSP MJPEG Server', '/rtsp_mjpeg_server');
+      rtspMjpegService.getCharacteristic(hap.Characteristic.On)
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          const message = value ? 'ON' : 'OFF';
+          this.publishMqtt(config.dafang_topic + '/rtsp_mjpeg_server/set', message);
+          callback();
+        });
+      accessory.addService(rtspMjpegService);
+    }
+    if (config.accessories.rtsp_h264_server) {
+      rtspH264Service = new hap.Service.Switch(config.name + ' RTSP H264 Server', '/rtsp_h264_server');
+      rtspH264Service.getCharacteristic(hap.Characteristic.On)
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          const message = value ? 'ON' : 'OFF';
+          this.publishMqtt(config.dafang_topic + '/rtsp_h264_server/set', message);
+          callback();
+        });
+      accessory.addService(rtspH264Service);
+    }
+    if (config.accessories.remount_sdcard) {
+      remountService = new hap.Service.Switch(config.name + ' Remount SD Card', '/remount_sdcard');
+      remountService.getCharacteristic(hap.Characteristic.On)
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          if (value) {
+            this.publishMqtt(config.dafang_topic + '/remount_sdcard/set', 'ON');
+            if (value) {
+              setTimeout(() => {
+                if (remountService) {
+                  remountService.updateCharacteristic(hap.Characteristic.On, false);
+                }
+              }, 1000);
+            }
+          }
+          callback();
+        });
+      accessory.addService(remountService);
+    }
+    if (config.accessories.reboot) {
+      rebootService = new hap.Service.Switch(config.name + ' Reboot', '/reboot');
+      rebootService.getCharacteristic(hap.Characteristic.On)
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          if (value) {
+            this.publishMqtt(config.dafang_topic + '/reboot/set', 'ON');
+            if (value) {
+              setTimeout(() => {
+                if (rebootService) {
+                  rebootService.updateCharacteristic(hap.Characteristic.On, false);
+                }
+              }, 1000);
+            }
+          }
+          callback();
+        });
+      accessory.addService(rebootService);
     }
 
     this.accessories.push(accessory);
@@ -503,6 +575,18 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
             break;
           case '/recording':
             this.handleBoolService(accessory, hap.Service.Switch, '/recording', msg);
+            break;
+          case '/rtsp_mjpeg_server':
+            this.handleBoolService(accessory, hap.Service.Switch, '/rtsp_mjpeg_server', msg);
+            break;
+          case '/rtsp_h264_server':
+            this.handleBoolService(accessory, hap.Service.Switch, '/rtsp_h264_server', msg);
+            break;
+          case '/remount_sdcard':
+            this.handleBoolService(accessory, hap.Service.Switch, '/remount_sdcard', msg);
+            break;
+          case '/reboot':
+            this.handleBoolService(accessory, hap.Service.Switch, '/reboot', msg);
             break;
         }
       }

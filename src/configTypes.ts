@@ -29,4 +29,8 @@ export type AccessoriesConfig = {
   recording: boolean;
   snapshot: boolean;
   brightness: string;
+  rtsp_mjpeg_server: boolean;
+  rtsp_h264_server: boolean;
+  remount_sdcard: boolean;
+  reboot: boolean;
 };
