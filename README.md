@@ -57,3 +57,7 @@ Edit your `config.json` accordingly. Configuration sample:
     - `motorsHorizontal`: Exposes panning left and right as switches.
     - `recording`: Exposes video recording as a switch.
     - `snapshot`: Exposes snapshot as a switch.
+    - `rtsp_mjpeg_server`: Exposes RTSP MJPEG server as a switch.
+    - `rtsp_h264_server`: Exposes RTSP H264 server as a switch.
+    - `remount_sdcard`: Exposes remounting SD card as a switch.
+    - `reboot`: Exposes rebotting as a switch.

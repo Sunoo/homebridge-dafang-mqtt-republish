@@ -132,6 +132,22 @@
                                         { "title": "Hardware", "enum": ["hw"] },
                                         { "title": "Virtual", "enum": ["virtual"] }
                                     ]
+                                },
+                                "rtsp_mjpeg_server": {
+                                    "title": "RTSP MJPEG Server",
+                                    "type": "boolean"
+                                },
+                                "rtsp_h264_server": {
+                                    "title": "RTSP H264 Server",
+                                    "type": "boolean"
+                                },
+                                "remount_sdcard": {
+                                    "title": "Remount SD Card",
+                                    "type": "boolean"
+                                },
+                                "reboot": {
+                                    "title": "Reboot",
+                                    "type": "boolean"
                                 }
                             }
                         }
