@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Dafang MQTT Republish",
   "name": "homebridge-dafang-mqtt-republish",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Routes Dafang Hacks Motion Messages to homebridge-camera-ffmpeg and Exposes Features to HomeKit",
   "main": "dist/index.js",
   "repository": {
@@ -17,6 +17,24 @@
   ],
   "author": "David Maher",
   "license": "BSD-2-Clause",
+  "funding": [
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/sunookitsune"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/sunoo"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/Sunoo"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Sunoo"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/Sunoo/homebridge-dafang-mqtt-republish/issues"
   },
