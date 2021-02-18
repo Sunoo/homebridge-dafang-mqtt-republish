@@ -24,9 +24,8 @@ const PLATFORM_NAME = 'dafangMqtt';
 type Camera = {
   name: string;
   dafang_topic: string;
-  cooldown: number;
+  cooldown: boolean;
   motion: boolean;
-  timer?: NodeJS.Timeout;
 };
 
 class DafangMqttPlatform implements DynamicPlatformPlugin {
@@ -41,14 +40,14 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
 
   constructor(log: Logging, config: PlatformConfig, api: API) {
     this.log = log;
-    this.config = config as unknown as DafangMqttPlatformConfig;
+    this.config = config as DafangMqttPlatformConfig;
     this.api = api;
 
     this.accessories = [];
 
     const server = config.server || '127.0.0.1';
     const port = config.port || '1883';
-    this.mqttUrl = 'mqtt://' + server + ':' + port;
+    this.mqttUrl = (this.config.tls ? 'mqtts://' : 'mqtt://') + server + ':' + port;
 
     if (config.homebridge_topic) {
       if(config.homebridge_topic == 'homebridge/motion') {
@@ -66,39 +65,36 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
 
     this.cameras = [];
     cameraConfigs.forEach((camera: CameraConfig) => {
-      const newCamera = {
-        name: camera.name,
-        dafang_topic: camera.dafang_topic,
-        cooldown: camera.cooldown || 0,
-        motion: false,
-        timer: undefined
-      };
-
-      this.log.info('Configuring "' + newCamera.name + '" on topic "' + newCamera.dafang_topic + '" with ' + (newCamera.cooldown > 0 ? newCamera.cooldown + ' second' : 'no') + ' cooldown.');
+      this.log.info('Configuring "' + camera.name + '" on topic "' + camera.dafang_topic  + (camera.cooldown ? '".' : '" with no cooldown.'));
 
       let error = false;
 
-      if (!newCamera.name) {
+      if (!camera.name) {
         this.log.warn('WARNING: No name set for this camera. It will not work unless this is corrected.');
         error = true;
       }
 
-      if (!newCamera.dafang_topic) {
+      if (!camera.dafang_topic) {
         this.log.warn('WARNING: No topic set for this camera. It will not work unless this is corrected.');
         error = true;
       }
 
-      if (this.cameras.find(camera => camera.name === newCamera.name)) {
-        this.log.warn('WARNING: Multiple cameras named "' + newCamera.name + '" configured. Only the first loaded will function.');
+      if (this.cameras.find(camera => camera.name === camera.name)) {
+        this.log.warn('WARNING: Multiple cameras named "' + camera.name + '" configured. Only the first loaded will function.');
         error = true;
       }
-      if (this.cameras.find(camera => camera.dafang_topic === newCamera.dafang_topic)) {
-        this.log.warn('WARNING: Multiple cameras with topic "' + newCamera.dafang_topic + '" configured. Only the first loaded will function.');
+      if (this.cameras.find(camera => camera.dafang_topic === camera.dafang_topic)) {
+        this.log.warn('WARNING: Multiple cameras with topic "' + camera.dafang_topic + '" configured. Only the first loaded will function.');
         error = true;
       }
 
       if (!error) {
-        this.cameras.push(newCamera);
+        this.cameras.push({
+          name: camera.name!,
+          dafang_topic: camera.dafang_topic!,
+          cooldown: camera.cooldown || false,
+          motion: false
+        });
       } else {
         this.log.warn('There was error with the config so this camera was ignored.');
       }
@@ -110,7 +106,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
   configureAccessory(accessory: PlatformAccessory): void {
     this.log('Configuring accessories for ' + accessory.displayName + '...');
 
-    const config = this.config.cameras.find((camera: CameraConfig) => camera.name === accessory.displayName);
+    const config = this.config.cameras?.find((camera: CameraConfig) => camera.name === accessory.displayName);
 
     if (!config || !config.accessories) {
       this.accessories.push(accessory);
@@ -136,6 +132,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     let motorsDownService = accessory.getServiceById(hap.Service.Switch, '/motors/vertical/down');
     let motorsLeftService = accessory.getServiceById(hap.Service.Switch, '/motors/horizontal/left');
     let motorsRightService = accessory.getServiceById(hap.Service.Switch, '/motors/horizontal/right');
+    let motorsCalibrateService = accessory.getServiceById(hap.Service.Switch, '/motors/set/calibrate');
     let recordingService = accessory.getServiceById(hap.Service.Switch, '/recording');
     let snapshotService = accessory.getServiceById(hap.Service.Switch, '/snapshot');
     let rtspMjpegService = accessory.getServiceById(hap.Service.Switch, '/rtsp_mjpeg_server');
@@ -175,6 +172,9 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     }
     if (motorsRightService) {
       accessory.removeService(motorsRightService);
+    }
+    if (motorsCalibrateService) {
+      accessory.removeService(motorsCalibrateService);
     }
     if (recordingService) {
       accessory.removeService(recordingService);
@@ -327,6 +327,24 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
         });
       accessory.addService(motorsRightService);
     }
+    if (config.accessories.motorsCalibrate) {
+      motorsCalibrateService = new hap.Service.Switch(config.name + ' Calibrate', '/motors/set/calibrate');
+      motorsCalibrateService.getCharacteristic(hap.Characteristic.On)
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          if (value) {
+            this.publishMqtt(config.dafang_topic + '/motors/set', 'calibrate');
+            if (value) {
+              setTimeout(() => {
+                if (motorsCalibrateService) {
+                  motorsCalibrateService.updateCharacteristic(hap.Characteristic.On, false);
+                }
+              }, 1000);
+            }
+          }
+          callback();
+        });
+      accessory.addService(motorsCalibrateService);
+    }
     if (config.accessories.recording) {
       recordingService = new hap.Service.Switch(config.name + ' Recording', '/recording');
       recordingService.getCharacteristic(hap.Characteristic.On)
@@ -416,11 +434,11 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
   }
 
   didFinishLaunching(): void {
-    this.config.cameras.forEach((camera: CameraConfig) => {
+    this.config.cameras?.forEach((camera: CameraConfig) => {
       if (camera.accessories) {
         if (!this.accessories.find((acc) => acc.displayName === camera.name)) {
-          const uuid = hap.uuid.generate(camera.dafang_topic);
-          const accessory = new Accessory(camera.name, uuid);
+          const uuid = hap.uuid.generate(camera.dafang_topic!);
+          const accessory = new Accessory(camera.name!, uuid);
           this.configureAccessory(accessory);
           this.api.registerPlatformAccessories('homebridge-dafang-mqtt-republish', 'dafangMqtt', [accessory]);
         }
@@ -428,7 +446,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     });
 
     this.accessories.forEach((accessory) => {
-      const config = this.config.cameras.find((camera: CameraConfig) => camera.name === accessory.displayName);
+      const config = this.config.cameras?.find((camera: CameraConfig) => camera.name === accessory.displayName);
       if (!config || !config.accessories) {
         this.api.unregisterPlatformAccessories('homebridge-dafang-mqtt-republish', 'dafangMqtt', [accessory]);
       }
@@ -461,31 +479,13 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
       }
       if (isOn) {
         camera.motion = true;
-        if (!camera.timer) {
-          this.publishMqtt(this.homebridge_topic + '/motion', camera.name);
-        } else {
-          this.log.debug('Motion set received, but cooldown running: ' + camera.name);
-        }
-        if (camera.cooldown > 0) {
-          if (camera.timer) {
-            this.log.debug('Cancelling existing cooldown timer: ' + camera.name);
-            clearTimeout(camera.timer);
-          }
-          this.log.debug('Cooldown enabled, starting timer: ' + camera.name);
-          camera.timer = setTimeout(((): void => {
-            this.log.debug('Cooldown finished, motion detected = ' + camera.motion + ': ' + camera.name);
-            if (!camera.motion) {
-              this.publishMqtt(this.homebridge_topic + '/motion/reset', camera.name);
-            }
-            camera.timer = undefined;
-          }).bind(this), camera.cooldown * 1000);
-        }
+        this.publishMqtt(this.homebridge_topic + '/motion', camera.name);
       } else {
         camera.motion = false;
-        if (!camera.timer) {
+        if (!camera.cooldown) {
           this.publishMqtt(this.homebridge_topic + '/motion/reset', camera.name);
         } else {
-          this.log.debug('Motion clear received, but cooldown running: ' + camera.name);
+          this.log.debug('Motion clear received, but following homebridge-camera-ffmpeg cooldown instead: ' + camera.name);
         }
       }
     }
@@ -519,7 +519,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
       }
       const service = this.getService(accessory, hap.Service.LightSensor, '/brightness');
       if (service) {
-        const config = this.config.cameras.find((camera: CameraConfig) => camera.name === accessory.displayName);
+        const config = this.config.cameras?.find((camera: CameraConfig) => camera.name === accessory.displayName);
         if (config?.accessories?.brightness) {
           switch (config.accessories.brightness) {
             case 'hw':

@@ -26,6 +26,11 @@
                 "placeholder": "1883",
                 "description": "The port of your MQTT server."
             },
+            "tls": {
+                "title": "MQTT TLS",
+                "type": "boolean",
+                "description": "Use TLS to connect to the MQTT server."
+            },
 			"homebridge_topic": {
 				"title": "Homebridge MQTT Topic",
 				"type": "string",
@@ -55,11 +60,9 @@
                 			"description": "MQTT topic that your camera publishes to. (Must be unique per camera)"
                         },
                         "cooldown": {
-                            "title": "Cooldown (Seconds)",
-                            "type": "integer",
-							"placeholder": 0,
-							"minimum": 0,
-                			"description": "Set to 0 to disable."
+                            "title": "Cooldown",
+                            "type": "boolean",
+                			"description": "Follow cooldown defined in the Homebridge Camera FFmpeg config."
                         },
                         "manufacturer": {
                             "title": "Manufacturer",
@@ -115,6 +118,10 @@
                                 },
                                 "motorsHorizontal": {
                                     "title": "Pan",
+                                    "type": "boolean"
+                                },
+                                "motorsCalibrate": {
+                                    "title": "Calibrate",
                                     "type": "boolean"
                                 },
                                 "recording": {
