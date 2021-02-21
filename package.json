@@ -2,7 +2,7 @@
   "displayName": "Homebridge Dafang MQTT Republish",
   "name": "homebridge-dafang-mqtt-republish",
   "version": "2.3.0",
-  "description": "Routes Dafang Hacks Motion Messages to homebridge-camera-ffmpeg and Exposes Features to HomeKit",
+  "description": "Exposes Dafang Hacks Features as HomeKit Accessories",
   "main": "dist/index.js",
   "repository": {
     "type": "git",

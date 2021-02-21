@@ -2,7 +2,7 @@
     "pluginAlias": "dafangMqtt",
     "pluginType": "platform",
     "singular": true,
-    "headerDisplay": "Routes Dafang Hacks Motion Messages to homebridge-camera-ffmpeg and Exposes Features to HomeKit",
+    "headerDisplay": "Exposes Dafang Hacks Features as HomeKit Accessories",
     "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-dafang-mqtt-republish/pulls) on [Project Page](https://github.com/Sunoo/homebridge-dafang-mqtt-republish).",
     "schema": {
         "type": "object",
