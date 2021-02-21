@@ -24,8 +24,6 @@ const PLATFORM_NAME = 'dafangMqtt';
 type Camera = {
   name: string;
   dafang_topic: string;
-  cooldown: boolean;
-  motion: boolean;
 };
 
 class DafangMqttPlatform implements DynamicPlatformPlugin {
@@ -34,7 +32,6 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
   private readonly config: DafangMqttPlatformConfig;
   private readonly accessories: Array<PlatformAccessory>;
   private readonly mqttUrl: string;
-  private readonly homebridge_topic?: string;
   private readonly cameras: Array<Camera>;
   private client?: mqtt.MqttClient;
 
@@ -49,14 +46,6 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     const port = config.port || '1883';
     this.mqttUrl = (this.config.tls ? 'mqtts://' : 'mqtt://') + server + ':' + port;
 
-    if (config.homebridge_topic) {
-      if(config.homebridge_topic == 'homebridge/motion') {
-        this.homebridge_topic = 'homebridge';
-      } else {
-        this.homebridge_topic = config.homebridge_topic;
-      }
-    }
-
     const cameraConfigs = config.cameras || [];
 
     if (cameraConfigs.length == 0) {
@@ -65,7 +54,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
 
     this.cameras = [];
     cameraConfigs.forEach((camera: CameraConfig) => {
-      this.log.info('Configuring "' + camera.name + '" on topic "' + camera.dafang_topic  + (camera.cooldown ? '".' : '" with no cooldown.'));
+      this.log.info('Configuring "' + camera.name + '" on topic "' + camera.dafang_topic  + '".');
 
       let error = false;
 
@@ -91,9 +80,7 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
       if (!error) {
         this.cameras.push({
           name: camera.name!,
-          dafang_topic: camera.dafang_topic!,
-          cooldown: camera.cooldown || false,
-          motion: false
+          dafang_topic: camera.dafang_topic!
         });
       } else {
         this.log.warn('There was error with the config so this camera was ignored.');
@@ -471,26 +458,6 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  handleMotion(camera: Camera, message: string): void {
-    if (this.homebridge_topic) {
-      const isOn = this.parseBoolMsg(message);
-      if (isOn === undefined) {
-        return;
-      }
-      if (isOn) {
-        camera.motion = true;
-        this.publishMqtt(this.homebridge_topic + '/motion', camera.name);
-      } else {
-        camera.motion = false;
-        if (!camera.cooldown) {
-          this.publishMqtt(this.homebridge_topic + '/motion/reset', camera.name);
-        } else {
-          this.log.debug('Motion clear received, but following homebridge-camera-ffmpeg cooldown instead: ' + camera.name);
-        }
-      }
-    }
-  }
-
   getService<T extends WithUUID<typeof Service>>(accessory: PlatformAccessory, type: string | T, subtype: string): Service | undefined {
     if (accessory) {
       return accessory.getServiceById(type, subtype);
@@ -549,9 +516,6 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
         const accessory = this.accessories.find((acc: PlatformAccessory) => acc.displayName === camera.name);
         const command = topic.substring(camera.dafang_topic.length);
         switch (command) {
-          case '/motion':
-            this.handleMotion(camera, msg);
-            break;
           case '/leds/blue':
             this.handleBoolService(accessory, hap.Service.Lightbulb, '/leds/blue', msg);
             break;

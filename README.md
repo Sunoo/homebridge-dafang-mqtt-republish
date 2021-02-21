@@ -2,7 +2,9 @@
 
 [![npm](https://img.shields.io/npm/v/homebridge-dafang-mqtt-republish) ![npm](https://img.shields.io/npm/dt/homebridge-dafang-mqtt-republish)](https://www.npmjs.com/package/homebridge-dafang-mqtt-republish) [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 
-This plugin republishes MQTT motion messages from [Dafang Hacks](https://github.com/EliasKotlyar/Xiaomi-Dafang-Hacks) into a format [homebridge-camera-ffmpeg](https://github.com/homebridge-plugins/homebridge-camera-ffmpeg) understands.
+This plugin handles MQTT messages from [Dafang Hacks](https://github.com/EliasKotlyar/Xiaomi-Dafang-Hacks) to allow control of many features from within HomeKit.
+
+The "republish" in the name is because this started as a way to to republish motion MQTT messages for [homebridge-camera-ffmpeg](https://github.com/homebridge-plugins/homebridge-camera-ffmpeg), but that plugin now can handle MQTT messages from Dafang Hacks directly when properly configured, so that functionality has been removed from this.
 
 ## Installation
 
@@ -23,7 +25,6 @@ Edit your `config.json` accordingly. Configuration sample:
         "platform": "dafangMqtt",
         "server": "10.0.1.190",
         "port": 1883,
-        "homebridge_topic": "homebridge",
         "cameras": [
             {
                 "name": "Cat Food Camera",
@@ -37,11 +38,9 @@ Edit your `config.json` accordingly. Configuration sample:
 - `server`: The address of your MQTT server. (Default: 127.0.0.1)
 - `port`: The port of your MQTT server. (Default: 1883)
 - `tls`: Use TLS to connect to the MQTT server. (Default: false)
-- `homebridge_topic`: MQTT topic that homebridge-camera-ffmpeg is subscribed to. If not set, motion alerts will not be passed on.
 - `cameras`: _(Required)_ Array of Dafang Hacks camera configs (multiple supported).
   - `name`: _(Required)_ Name of your camera. (Needs to be the same as in homebridge-camera-ffmpeg config)
   - `dafang_topic`: _(Required)_ MQTT topic that your camera publishes to. (Must be unique per camera)
-  - `cooldown`: Follow cooldown defined in the Homebridge Camera FFmpeg config. (Default: false)
   - `manufacturer`: Manufacturer for exposed accessories.
   - `model`: Model for exposed accessories.
   - `serialNumber`: Serial number for exposed accessories.

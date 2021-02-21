@@ -6,14 +6,12 @@ export type DafangMqttPlatformConfig = {
   server?: string;
   port?: number;
   tls?: number;
-  homebridge_topic?: string;
   cameras?: Array<CameraConfig>;
 };
 
 export type CameraConfig = {
   name?: string;
   dafang_topic?: string;
-  cooldown?: boolean;
   manufacturer?: string;
   model?: string;
   serialNumber?: string;
