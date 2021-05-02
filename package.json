@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Dafang MQTT Republish",
   "name": "homebridge-dafang-mqtt-republish",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Exposes Dafang Hacks Features as HomeKit Accessories",
   "main": "dist/index.js",
   "repository": {

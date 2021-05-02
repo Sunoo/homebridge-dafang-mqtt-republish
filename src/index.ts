@@ -68,11 +68,11 @@ class DafangMqttPlatform implements DynamicPlatformPlugin {
         error = true;
       }
 
-      if (this.cameras.find(camera => camera.name === camera.name)) {
+      if (this.cameras.find(curCamera => curCamera.name === camera.name)) {
         this.log.warn('WARNING: Multiple cameras named "' + camera.name + '" configured. Only the first loaded will function.');
         error = true;
       }
-      if (this.cameras.find(camera => camera.dafang_topic === camera.dafang_topic)) {
+      if (this.cameras.find(curCamera => curCamera.dafang_topic === camera.dafang_topic)) {
         this.log.warn('WARNING: Multiple cameras with topic "' + camera.dafang_topic + '" configured. Only the first loaded will function.');
         error = true;
       }
